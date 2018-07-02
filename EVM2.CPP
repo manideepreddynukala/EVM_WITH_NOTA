@@ -1,9 +1,17 @@
-#include<iostream.h>
+#include<iostream> //iostream.h is not supported in gcc compiler. 2nd line is mandatory for cin and cout. clrscr won't work in gcc
+using namespace std;
+#include <bits/stdc++.h>
+//It is basically a header file that includes every standard library. In programming contests, using this file is a good idea,
+// when you want to reduce the time wasted in doing chores; especially when your rank is time sensitive. In this program it is used
+//for the custom sizeof
 #include<conio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<stdio.h>
-int id[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+
+int id[]={1,3,5,7,9,11,13,15}; // We need to update the voter ids before hand. This can't be dynamic
+int size = *(&id + 1) - id;
+std::vector< int > a;
 class candidate
 {
     public:
@@ -44,7 +52,7 @@ void voter:: getdata()
 {
     cout<<"\nEnter name of the voter : ";
     cin>>name;
-    cout<<"\nEnter your age";
+    cout<<"\nEnter your age ";
     cin>>age;
     if(age<18)
     {
@@ -59,12 +67,32 @@ void voter:: getdata()
 int voter::validate()
 {
     int count=0;
-    for(int i=0;i<=15;i++)
+    /* Code to check if same voter is voting again(If one voter id is entered multiple times
+    if (a.size()==0){
+       a.push_back(voterid);
+    }
+    else{
+        if (std::find(a.begin(), a.end(),voterid)==a.end()){
+                a.push_back(voterid);
+        }
+        else
+        {
+            cout<<"The person has already voted";
+            cout<<"why?";
+            return 1;
+            //for (int j = 0; j < (int)a.size(); j++) //displaying all elements of vector
+            //cout<< a.at(j) <<endl;
+
+        }
+    }*/
+
+    for(int i=0;i<size;i++){
     if(voterid==id[i])
     count++;
-   if(age<18||count==0)
+    }
+   if(age<18||count==0)//if age<18 and if entered voterid is not present in the voter list
     {
-        cout<<"\nThe candidate doesnt have right to vote: ";
+        cout<<"\nThe candidate doesn't have right to vote: ";
         return 1;
     }
     if(count==1)
@@ -73,7 +101,7 @@ int voter::validate()
     return 0;
 }
 
-voter v[10];candidate c[10];
+voter v[15];candidate c[10];
 void readparties()
 {
     for(int i=0;i<3;i++)
@@ -93,57 +121,71 @@ void readparties()
 }
 void voterdetails()
 {
-    int flag,index=0,vote;
+    int flag,index=0,vote,i=0;
+    char voter;
     void putcandidates();
-    for(int i=0;i<3;i++)
+    while(i<size)
     {
-    flag=0;
-    clrscr();
-    printf("\nEnter %d voter details \n",i+1);
-    v[i].getdata();
+        printf("Do you want to vote(Y/y)?");
+        cin>>voter;
+        if(voter !='y'&&voter!='Y')
+            {
+                break;
+            }
+		flag=0;
+		// clrscr();
+		printf("\nEnter %d voter details \n",i+1);
+		v[i].getdata();
         if(v[i].validate()==1)
         {
-        printf("\nRe-enter ");
-        getch();
-        flag=1;
+			printf("\nPress Enter to Re-enter the details");
+			i++;
+			getch();
+			flag=1;
         }
         else if(v[i].validate()==0)
         {
-            printf("\nVoter is not registered.. \nEnter your specified ID correctly \n");
+            printf("\nVoter is not registered.. \nPress enter to give ID correctly \n");
+            i++;
             getch();
             flag=1;
 
         }
 
-    if(flag==1)
-    {
-    i--;flag=0;
-    continue;
-    }
-    else
-    {
-        putcandidates();
-        for(int j=0;j<3;j++)
-        {
-            c[j].putdata();
-        }
-        printf("\nEnter the id of the candidate to vote for him :  ");
-        scanf("%d",&vote);
-             for(int k=0;k<3;k++)
-             {
-            if(vote==c[k].id)
-            {
-            index=1;
-            c[k].count++;
-            break;
-            }
-             }
-        if(index==0)
-        {
-        printf("\nYou have entered wrong id Re-try : ");
-        i--;
-        }
-    }
+		if(flag==1)
+		{
+			i--;flag=0;
+			continue;
+		}
+		else
+		{
+			putcandidates();
+			for(int j=0;j<3;j++)
+			{
+				c[j].putdata();
+			}
+			printf("\nEnter the id of the candidate to vote for him :  ");
+			scanf("%d",&vote);
+            for(int k=0;k<3;k++)
+				{
+					//cout<<"\n"<<c[k].id;
+					if(vote==c[k].id)
+					{
+						index=1;
+						c[k].count++;
+						//cout<<"\n"<<c[k].count;
+						break;
+					}
+				}
+			if(index==0)
+				{
+					printf("\nYou have entered wrong id Re-try : ");
+					i--;
+				}
+            else
+                printf("Voted successfully.\nPlease move to next cabin to collect your receipt\n\n\n\n\n");
+		}
+		i++;
     }
 
 }
@@ -157,42 +199,43 @@ void counting()
     for(int i=0;i<3;i++)
     {
         if(c[i].count>max)
-        max=c[i].count;
-        maxindex=i;
+        {
+            max=c[i].count;
+            maxindex=i;
+        }
+
     }
-    clrscr();
+//    clrscr();
     cout<<"\n\nResults of the election \n";
     cout<<"\nWinner is  "<<c[maxindex].name<<" of party "<<c[maxindex].partyname<<"  with votes  "<<max;
 }
-void main()
+int main(void)
 {
-    int op,k;
+    int op;
     do
     {
-    clrscr();
-    printf("\t\t------------------------------------------------\n");
-    printf("\t\t|             WELCOME TO ELECTIONS 2K14       |\n ");
-    printf("\t\t------------------------------------------------\n");
-    printf("\n1.Nominations\n2.Voter\n3.Counting\n4.Exit\nEnter choice : ");
-    scanf("%d",&op);
-    if(op==1)
-    {
-
-	readparties();
-
+//    	clrscr();
+		printf("\n\t\t------------------------------------------------\n");
+		printf("\t\t|             WELCOME TO ELECTIONS 2K14       |\n ");
+		printf("\t\t------------------------------------------------\n");
+		//cout << "Number of elements in arr[] is "<< size;
+		printf("\n1.Nominations\n2.Voter\n3.Counting\n4.Exit\nEnter choice : ");
+		scanf("%d",&op);
+		if(op==1)
+		{
+			readparties();
+		}
+		else if(op==2)
+		{
+			voterdetails();
+		}
+		else if(op==3)
+		{
+			counting();
+			cout<<"\n\n\n\n-----------Presented by--------------";
+			cout<<"\n\n\n\n-----------G.Jashwanth         (1602-12-737-011)\n\n N.Manideep Reddy       (1602-12-737-015)\n\n\n Thank You.......\n";
+			getch();
+		}
     }
-    else if(op==2)
-    {
-	voterdetails();
-    }
-    else if(op==3)
-    {
-	counting();
-	cout<<"\n\n\n\n-----------Presented by--------------";
-	cout<<"\n\n\n\n\\n\nG.Jashwanth         (1602-12-737-011)\n\n\n N.Manideep Reddy       (1602-12-737-015)\n\n\n Thank You.......";
-	getch();
-    }
-    }
-     while(op!=4);
-
+	while(op!=4);
 }

@@ -1,0 +1,124 @@
+Number of elements in an array A can be found out using the expression
+int size = *(&arr + 1) - arr;
+// C++ program to find size of an array by using a 
+// pointer hack.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int main()
+{
+    int  arr[] = {1, 2, 3, 4, 5, 6};
+    int size = *(&arr + 1) - arr;
+    cout << "Number of elements in arr[] is "
+         << size;
+    return 0;
+}
+
+Output :
+
+Number of elements in arr[] is 6
+How does this work?
+Here the pointer arithmetic does its part. We don’t need to explicitly convert each of the locations to character pointers.
+
+&arr ==> Pointer to an array of 6 elements.
+         [See this for difference between &arr
+          and arr]   
+
+(&arr + 1) ==> Address of 6 integers ahead as
+               pointer type is pointer to array
+               of 6 integers.
+
+*(&arr + 1) ==> Same address as (&arr + 1), but 
+                type of pointer is "int *".
+
+*(&arr + 1) - arr ==> Since *(&arr + 1) points 
+                   to the address 6 integers
+                   ahead of arr, the difference
+                   between two is 6.         
+				   
+				   
+				   
+What’s difference between “array” and “&array” for “int array[5]” ?
+If someone has defined an array such as “int array[5]”, what’s the meaning of “array” or “&array”? Are they both same or are they different? 
+You might be tempted to think that they both would point to the very first element of the array i.e. they both will have same address. Let us 
+find out!
+
+To check this, the very first thing that comes to mind is the following program.
+
+#include "stdio.h"
+int main()
+{
+   int array[5];
+ 
+   /* If %p is new to you, you can use %d as well */
+   printf("array=%p : &array=%p\n", array, &array);
+ 
+   return 0;
+}
+Output : array=0x7ffc71a95d70 : &array=0x7ffc71a95d70
+
+
+
+
+So you got same address for both “array” and “&array”. Again, you are tempted to think that both are same. 
+Well, they aren’t not! How come a variable and its & (i.e. address-of) be same. It doesn’t look logical but we saw that both “array” and 
+“&array” are printing same address. May be it’s too soon to conclude. The crux of this post is that even though they both are resulting in 
+same address but they are different types of addresses. And this is the difference between “array” and “&array”.
+
+And just to show this difference, I would suggest to take a look at the following program.
+
+#include "stdio.h"
+int main()
+{
+   int array[5];
+ 
+   /* If %p is new to you, you can use %d as well */
+   printf("array=%p : &array=%p\n", array, &array); 
+ 
+   printf("array+1 = %p : &array + 1 = %p", array+1, &array+1);
+ 
+   return 0;
+}
+
+Output: array=0x7ffd64341730 : &array=0x7ffd64341730
+array+1 = 0x7ffd64341734 : &array + 1 = 0x7ffd64341744
+
+With pointer arithmetic, we know what happens when we add an integer to a pointer. So can you guess the output of the above program without 
+running it? Shouldn’t “array+1” and “&array+1” point to same address. Well you might be surprised 🙂
+
+Basically, “array” is a “pointer to the first element of array” but “&array” is a “pointer to whole array of 5 int”. Since “array” is pointer 
+to int, addition of 1 resulted in an address with increment of 4 (assuming int size in your machine is 4 bytes). Since “&array” is pointer to 
+array of 5 ints, addition of 1 resulted in an address with increment of 4 x 5 = 20 = 0x14. Now you see why these two seemingly similar pointers 
+are different at core level. This logic can be extended to multidimensional arrays as well. Suppose double twoDarray[5][4] is a 2D array. Here, 
+“twoDarray” is a pointer to array of 4 int but “&twoDarray” is pointer to array of 5 rows arrays of 4 int”. If this sounds cryptic, you can 
+always have a small program to print these after adding 1. We hope that we could clarify that any array name itself is a pointer to the first 
+element but & (i.e. address-of) for the array name is a pointer to the whole array itself.
+
+
+#include<iostream>
+#include<stdio.h>
+#include<conio.h>
+#include <vector> //Arrays in C++ cannot change size at runtime. For that purpose, you should use vector<int> instead.
+#include<algorithm> //for find in line 17
+using namespace std;
+int main_d (void)
+{
+  std::vector< int > a = {3, 6, 8, 33};
+  int size = a.size();// *(&a + 1) - a;
+  int x;
+  cout<<"Enter the element you want to search ";
+  cin>>x;
+  //for(int i=0;i<size;i++)
+  //{
+    //  if (x==a[i]){
+    if (std::find(a.begin(), a.end(),x)!=a.end()){
+        cout<<"element already present in array";
+        goto label;
+    }
+      cout<<"element not present\n";
+      a.push_back(x); // adding x to vector
+       for (int j = 0; j < (int)a.size(); j++) //displaying all elements of vector
+        cout<< a.at(j) <<endl;
+      label:
+          cout<<"";
+}
